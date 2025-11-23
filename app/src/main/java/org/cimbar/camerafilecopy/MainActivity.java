@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -218,6 +219,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 this.activePath = null;
             }
         }
+    }
+
+    public void webview(View view) {
+        Intent intent = new Intent(this, WebViewActivity.class);
+        startActivity(intent);
     }
 
     private native String processImageJNI(long mat, String path, int modeInt);
