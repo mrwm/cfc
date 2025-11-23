@@ -30,6 +30,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    // Added this option so gradle doesn't complain about
+    // 2 files found for 'lib/arm64-v8a/libopencv_java4.so'
+    // Where we don't want to use the libopencv_java4.so in the cxx debug directory
+    packagingOptions {
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        //pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        //pickFirst 'lib/x86/libc++_shared.so'
+        //pickFirst 'lib/x86_64/libc++_shared.so'
+    }
     externalNativeBuild {
         cmake {
             path "src/cpp/CMakeLists.txt"
