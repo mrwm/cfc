@@ -31,9 +31,10 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="encode"
         android:onClick="webview"
+        android:text="code"
         app:layout_constraintBottom_toTopOf="@+id/mode_switch"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/mode_switch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
@@ -24,14 +25,17 @@ public class WebViewActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview);
-        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        int navHeight = getResources().getDimensionPixelSize(resourceId);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         webView = findViewById(R.id.web_view);
         webViewSettings = webView.getSettings();
+
+        // I noticed that the decoder can't read if the nav bar is covering the code, so
+        // get the nav bar height and add it to the webview's margin
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        int navHeight = getResources().getDimensionPixelSize(resourceId);
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) webView.getLayoutParams();
         params.leftMargin = navHeight;
@@ -78,6 +82,10 @@ public class WebViewActivity extends Activity {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void exitWebView(View view) {
+        finish();
     }
 
 }
