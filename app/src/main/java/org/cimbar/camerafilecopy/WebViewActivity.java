@@ -67,7 +67,7 @@ public class WebViewActivity extends Activity {
             }
         });
 
-        webView.loadUrl("https://cimbar.org/");
+        webView.loadUrl("file:///android_asset/cimbar_js.html");
 
         //webView.loadData("Local html file if cached or downloaded","text/html", "UTF-8");
         webViewSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
