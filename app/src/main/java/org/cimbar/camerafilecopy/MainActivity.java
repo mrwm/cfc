@@ -1,23 +1,40 @@
 package org.cimbar.camerafilecopy;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.GestureDetectorCompat;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -36,6 +53,15 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private static final String TAG = "MainActivity";
     private static final int CAMERA_PERMISSION_REQUEST = 1;
     private static final int CREATE_FILE = 11;
+
+    private WebView webView;
+    protected WebSettings webViewSettings;
+    private ValueCallback<Uri[]> uploadMessage;
+    private final static int FILECHOOSER_RESULTCODE=222;
+    private AutoTransition autoTransition;
+    private ViewGroup rootView;
+
+    private GestureDetectorCompat mDetector;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private ModeSelToggle mModeSwitch;
@@ -92,6 +118,25 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 }
             }
         });
+
+        /// WebView stuff
+        // programmatically create the webview
+        webView = new WebView(MainActivity.this);
+        webView.setId(View.generateViewId());
+        webView.setLayoutParams(new FrameLayout.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
+        webViewSettings = webView.getSettings();
+
+        webViewSettings.setJavaScriptEnabled(true);
+        webViewSettings.setAllowFileAccess(true);
+
+        // Get the root view and create a transition.
+        rootView = findViewById(R.id.main);
+        autoTransition = new AutoTransition();
+        autoTransition.setDuration(500);
+
+        // Set up the swipe gestures
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
     }
 
     @Override
@@ -219,14 +264,111 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 this.activePath = null;
             }
         }
-    }
-
-    public void webview(View view) {
-        Intent intent = new Intent(this, WebViewActivity.class);
-        startActivity(intent);
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (uploadMessage == null) return;
+            uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+            uploadMessage = null;
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private native String processImageJNI(long mat, String path, int modeInt);
     private native void shutdownJNI();
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        if (this.mDetector.onTouchEvent(event)) {
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String TAG = "Gestures";
+
+        // We only want fling gestures to trigger the view transitions, not scrolling.
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            //Log.d(TAG, "onFling: " + event1.toString() + event2.toString());
+            float angle = (float) Math.toDegrees(Math.atan2(event1.getY() - event2.getY(), event2.getX() - event1.getX()));
+
+            if (angle > -45 && angle <= 45) {
+                Log.d(TAG, "Right to Left swipe performed");
+                return true;
+            }
+
+            if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) {
+                Log.d(TAG, "Left to Right swipe performed");
+                return true;
+            }
+
+            if (angle < -45 && angle >= -135) {
+                Log.d(TAG, "Up to Down swipe performed");
+                // Then remove the camera view
+                if (mOpenCvCameraView.getParent() != null){
+                    mOpenCvCameraView.disableView();
+                    autoTransition.setDuration(250);
+                    TransitionManager.beginDelayedTransition(rootView, autoTransition);
+                    rootView.removeView(mOpenCvCameraView);
+                }
+                // First add the webview
+                if (webView.getParent() == null){
+                    webView.setWebChromeClient(new WebChromeClient() {
+                        @Override
+                        public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                            if (uploadMessage != null) {
+                                uploadMessage.onReceiveValue(null);
+                            }
+                            uploadMessage = filePathCallback;
+                            Intent intent = fileChooserParams.createIntent();
+                            try {
+                                startActivityForResult(intent, FILECHOOSER_RESULTCODE);
+                            } catch (ActivityNotFoundException e) {
+                                uploadMessage = null;
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+                    webView.loadUrl("file:///android_asset/cimbar_js.html");
+                    autoTransition.setDuration(70);
+                    TransitionManager.beginDelayedTransition(rootView, autoTransition);
+                    rootView.addView(webView);
+
+                    webView.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event)
+                        {
+                            return mDetector.onTouchEvent(event);
+                        }
+                    });
+                }
+                return true;
+            }
+
+            if (angle > 45 && angle <= 135) {
+                Log.d(TAG, "Down to Up swipe performed");
+                autoTransition.setDuration(70);
+                // Then remove the webview
+                if (webView.getParent() != null){
+                    TransitionManager.beginDelayedTransition(rootView, autoTransition);
+                    rootView.removeView(webView);
+                }
+                // First add the camera view
+                if (mOpenCvCameraView.getParent() == null){
+                    mOpenCvCameraView.enableView();
+                    autoTransition.setDuration(1000);
+                    TransitionManager.beginDelayedTransition(rootView, autoTransition);
+                    rootView.addView(mOpenCvCameraView);
+                }
+                mModeSwitch.bringToFront();
+                return true;
+            }
+            return true;
+        }
+    }
+
 }
 
