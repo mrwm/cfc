@@ -40,7 +40,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private static final int CAMERA_PERMISSION_REQUEST = 1;
     private static final int CREATE_FILE = 11;
 
-    private ViewGroup rootView;
     private GestureDetectorCompat mDetector;
 
     private CameraBridgeViewBase mOpenCvCameraView;
@@ -98,9 +97,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 }
             }
         });
-
-        // Get the root view and create a transition.
-        rootView = findViewById(R.id.main);
 
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureListener());
