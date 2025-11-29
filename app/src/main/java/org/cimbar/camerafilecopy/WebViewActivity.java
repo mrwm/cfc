@@ -131,35 +131,25 @@ public class WebViewActivity extends Activity {
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             //Log.d(TAG, "onFling: " + event1.toString() + event2.toString());
-            float angle = (float) Math.toDegrees(Math.atan2(event1.getY() - event2.getY(), event2.getX() - event1.getX()));
-
-            if (angle > -45 && angle <= 45) {
-                Log.d(TAG, "Right to Left swipe performed");
-                finish();
-                return true;
-            }
-
-            if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) {
-                Log.d(TAG, "Left to Right swipe performed");
-                finish();
-                return true;
-            }
-
-            if (angle < -45 && angle >= -135) {
-                Log.d(TAG, "Up to Down swipe performed");
-                // First remove the camera view
-                // Then add the webview
-                finish();
-                return true;
-            }
-
-            if (angle > 45 && angle <= 135) {
-                Log.d(TAG, "Down to Up swipe performed");
-                // First remove the webview
-                // Then add the camera view
-                finish();
-                return true;
-            }
+            /// Directional logic if needed
+            //float angle = (float) Math.toDegrees(Math.atan2(event1.getY() - event2.getY(), event2.getX() - event1.getX()));
+            //if (angle > -45 && angle <= 45) {
+            //    Log.d(TAG, "Right to Left swipe performed");
+            //    return true;
+            //}
+            //if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) {
+            //    Log.d(TAG, "Left to Right swipe performed");
+            //    return true;
+            //}
+            //if (angle < -45 && angle >= -135) {
+            //    Log.d(TAG, "Up to Down swipe performed");
+            //    return true;
+            //}
+            //if (angle > 45 && angle <= 135) {
+            //    Log.d(TAG, "Down to Up swipe performed");
+            //    return true;
+            //}
+            finish();
             return true;
         }
     }
