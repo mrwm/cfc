@@ -28,7 +28,6 @@ public class WebViewActivity extends Activity {
     private ValueCallback<Uri[]> uploadMessage;
     private final static int FILECHOOSER_RESULTCODE=222;
 
-    private ViewGroup rootView;
     private GestureDetectorCompat mDetector;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -82,10 +81,6 @@ public class WebViewActivity extends Activity {
 
         //webView.loadData("Local html file if cached or downloaded","text/html", "UTF-8");
         webViewSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
-
-        // Get the root view and create a transition.
-        rootView = findViewById(R.id.web_main);
 
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureDetector());
