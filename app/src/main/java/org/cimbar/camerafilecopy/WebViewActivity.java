@@ -47,13 +47,6 @@ public class WebViewActivity extends Activity {
         int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
         int navHeight = getResources().getDimensionPixelSize(resourceId);
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) webView.getLayoutParams();
-        params.leftMargin = navHeight;
-        params.rightMargin = navHeight;
-        params.topMargin = navHeight;
-        params.bottomMargin = navHeight;
-        webView.setLayoutParams(params);
-
         webViewSettings.setJavaScriptEnabled(true);
         webViewSettings.setAllowFileAccess(true);
 
