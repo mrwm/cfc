@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -36,6 +35,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
+    private Toast introToast;
+
     private static final String TAG = "MainActivity";
     private static final int CAMERA_PERMISSION_REQUEST = 1;
     private static final int CREATE_FILE = 11;
@@ -101,6 +102,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureListener());
 
+        introToast = Toast.makeText(MainActivity.this, "Swipe to encode data :)",  Toast.LENGTH_LONG);
     }
 
     @Override
@@ -121,11 +123,12 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_SHORT).show();
+        introToast.show();
     }
 
     @Override
     public void onPause() {
+        introToast.cancel();
         shutdownJNI();
         super.onPause();
         if (mOpenCvCameraView != null)
@@ -146,6 +149,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     @Override
     public void onDestroy() {
+        introToast.cancel();
         shutdownJNI();
         super.onDestroy();
         if (mOpenCvCameraView != null)
@@ -267,6 +271,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             //    Log.d(TAG, "Down to Up swipe performed");
             //    return true;
             //}
+            introToast.cancel();
             if (mOpenCvCameraView != null)
                 mOpenCvCameraView.disableView();
             Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
