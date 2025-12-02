@@ -267,6 +267,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             //    Log.d(TAG, "Down to Up swipe performed");
             //    return true;
             //}
+            if (mOpenCvCameraView != null)
+                mOpenCvCameraView.disableView();
             Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
