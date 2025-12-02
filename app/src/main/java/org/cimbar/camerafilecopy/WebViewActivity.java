@@ -89,7 +89,6 @@ public class WebViewActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to decode data :)",  Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_SHORT).show();
     }
 
     @Override
