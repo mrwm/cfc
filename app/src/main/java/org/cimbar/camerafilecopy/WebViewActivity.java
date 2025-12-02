@@ -41,23 +41,8 @@ public class WebViewActivity extends Activity {
 
         webView = findViewById(R.id.web_view);
         webViewSettings = webView.getSettings();
-
-        // I noticed that the decoder can't read if the nav bar is covering the code, so
-        // get the nav bar height and add it to the webview's margin
-        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        int navHeight = getResources().getDimensionPixelSize(resourceId);
-
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) webView.getLayoutParams();
-        params.leftMargin = navHeight;
-        params.rightMargin = navHeight;
-        params.topMargin = navHeight;
-        params.bottomMargin = navHeight;
-        webView.setLayoutParams(params);
-
         webViewSettings.setJavaScriptEnabled(true);
         webViewSettings.setAllowFileAccess(true);
-
-        //webView.setWebViewClient(new WebViewClient());
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -79,9 +64,6 @@ public class WebViewActivity extends Activity {
 
         webView.loadUrl("file:///android_asset/cimbar_js.html");
 
-        //webView.loadData("Local html file if cached or downloaded","text/html", "UTF-8");
-        webViewSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureDetector());
         webView.setOnTouchListener(new View.OnTouchListener() {
@@ -96,7 +78,6 @@ public class WebViewActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to decode data :)",  Toast.LENGTH_LONG).show();
     }
 
     @Override

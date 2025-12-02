@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -267,6 +267,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             //    Log.d(TAG, "Down to Up swipe performed");
             //    return true;
             //}
+            if (mOpenCvCameraView != null)
+                mOpenCvCameraView.disableView();
             Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
