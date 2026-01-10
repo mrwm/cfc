@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -41,6 +40,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private static final int CREATE_FILE = 11;
 
     private GestureDetectorCompat mDetector;
+    private Toast introToast;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private ModeSelToggle mModeSwitch;
@@ -101,6 +101,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         // Set up the swipe gestures
         mDetector = new GestureDetectorCompat(this, new FlingGestureListener());
 
+        // and the hint toast
+        introToast = Toast.makeText(this, "↕ Swipe to encode data! Or use cimbar.org :)",  Toast.LENGTH_LONG);
     }
 
     @Override
@@ -121,7 +123,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(this, "Swipe to encode data :)",  Toast.LENGTH_SHORT).show();
+        introToast.show();
     }
 
     @Override
@@ -248,27 +250,18 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            //Log.d(TAG, "onFling: " + event1.toString() + event2.toString());
-            /// Directional logic if needed
-            //float angle = (float) Math.toDegrees(Math.atan2(event1.getY() - event2.getY(), event2.getX() - event1.getX()));
-            //if (angle > -45 && angle <= 45) {
-            //    Log.d(TAG, "Right to Left swipe performed");
-            //    return true;
-            //}
-            //if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) {
-            //    Log.d(TAG, "Left to Right swipe performed");
-            //    return true;
-            //}
-            //if (angle < -45 && angle >= -135) {
-            //    Log.d(TAG, "Up to Down swipe performed");
-            //    return true;
-            //}
-            //if (angle > 45 && angle <= 135) {
-            //    Log.d(TAG, "Down to Up swipe performed");
-            //    return true;
-            //}
+            final int THRESHOLD = 100;
+            final int VEL_THRESHOLD = 100;
+
+            if (Math.abs(velocityY) < VEL_THRESHOLD)
+                return false;
+            if (Math.abs(event1.getY() - event2.getY()) < THRESHOLD)
+                return false;
             if (mOpenCvCameraView != null)
                 mOpenCvCameraView.disableView();
+            if (introToast != null)
+                introToast.cancel();
+
             Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

@@ -10,13 +10,11 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.core.view.GestureDetectorCompat;
 
@@ -43,6 +41,7 @@ public class WebViewActivity extends Activity {
         webViewSettings = webView.getSettings();
         webViewSettings.setJavaScriptEnabled(true);
         webViewSettings.setAllowFileAccess(true);
+        webViewSettings.setAllowFileAccessFromFileURLs(true);
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -106,25 +105,14 @@ public class WebViewActivity extends Activity {
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            //Log.d(TAG, "onFling: " + event1.toString() + event2.toString());
-            /// Directional logic if needed
-            //float angle = (float) Math.toDegrees(Math.atan2(event1.getY() - event2.getY(), event2.getX() - event1.getX()));
-            //if (angle > -45 && angle <= 45) {
-            //    Log.d(TAG, "Right to Left swipe performed");
-            //    return true;
-            //}
-            //if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) {
-            //    Log.d(TAG, "Left to Right swipe performed");
-            //    return true;
-            //}
-            //if (angle < -45 && angle >= -135) {
-            //    Log.d(TAG, "Up to Down swipe performed");
-            //    return true;
-            //}
-            //if (angle > 45 && angle <= 135) {
-            //    Log.d(TAG, "Down to Up swipe performed");
-            //    return true;
-            //}
+            final int THRESHOLD = 100;
+            final int VEL_THRESHOLD = 100;
+
+            if (Math.abs(velocityY) < VEL_THRESHOLD)
+                return false;
+            if (Math.abs(event1.getY() - event2.getY()) < THRESHOLD)
+                return false;
+
             finish();
             return true;
         }
